@@ -8,6 +8,7 @@ use de\bifroststormengine\http\Internal\MiddlewareChainHandler;
 use de\bifroststormengine\http\Request\Request;
 use de\bifroststormengine\http\Response\Response;
 use de\bifroststormengine\http\Routing\RouterInterface;
+use de\bifroststormengine\http\Routing\RouteMatch;
 use de\bifroststormengine\http\Handler\MiddlewareInterface;
 use Throwable;
 #endregion
@@ -15,7 +16,7 @@ use Throwable;
 final class HttpDispatcher
 {
 	#region constants
-	public const ATTR_ROUTE_MATCH = 'routeMatch';
+	public const ATTR_ROUTE_MATCH = RouteMatch::class;
 	#endregion
 
 	#region properties

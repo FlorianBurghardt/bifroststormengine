@@ -156,5 +156,18 @@ final class RequestTest extends TestKernel
 		$this->assertEquals(null, $request->getRawBody());
 		$this->assertEquals([], $request->getParsedBody());
 	}
+
+	public function testGetRouteMatchThrowsWhenMissing(): void
+	{
+		$request = new Request(
+			method: HttpMethod::GET,
+			uri: '/test'
+		);
+
+		$this->assertThrows(
+			fn() => $request->getRouteMatch(),
+			\RuntimeException::class
+		);
+	}
 	#endregion
 }

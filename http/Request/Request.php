@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace de\bifroststormengine\http\Request;
 
 use de\bifroststormengine\http\Enum\HttpMethod;
+use de\bifroststormengine\http\Routing\RouteMatch;
 #endregion
 
 final class Request
@@ -121,6 +122,18 @@ final class Request
 	public function getProtocolVersion(): string
 	{
 		return $this->protocolVersion;
+	}
+
+	public function getRouteMatch(): RouteMatch
+	{
+		$value = $this->attributes[\de\bifroststormengine\http\HttpDispatcher::ATTR_ROUTE_MATCH] ?? null;
+
+		if (!$value instanceof RouteMatch)
+		{
+			throw new \RuntimeException('RouteMatch attribute missing or invalid.');
+		}
+
+		return $value;
 	}
 	#endregion
 }

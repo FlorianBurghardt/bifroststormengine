@@ -83,7 +83,7 @@ final class HttpPipelineIntegrationTest extends TestKernel
 				handler: new class implements HttpHandlerInterface {
 					public function handle(Request $request): Response
 					{
-						$match = $request->getAttribute(HttpDispatcher::ATTR_ROUTE_MATCH);
+						$match = $request->getRouteMatch();
 						$id = $match->getPathParam('id');
 
 						return new JsonResponse(['id' => $id], HTTPStatusCode::OK);
