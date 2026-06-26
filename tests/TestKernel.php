@@ -61,6 +61,21 @@ abstract class TestKernel
 		}
 	}
 
+	protected function assertSame(mixed $expected, mixed $actual, string $message = ''): void
+	{
+		if ($expected !== $actual)
+		{
+			throw new TestException(
+				TestExceptionType::ASSERTION_SAME,
+				TestExceptionType::ASSERTION_SAME->value,
+				"assertSame failed: {$message}\nExpected (same): " .
+					\var_export($expected, true) .
+					"\nActual: " .
+					\var_export($actual, true)
+			);
+		}
+	}
+
 	protected function assertTrue(bool $condition, string $message = ''): void
 	{
 		if (!$condition)

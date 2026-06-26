@@ -16,5 +16,6 @@ enum TestExceptionType : int
 	case ASSERTION_INSTANCE_OF = 1006;
 	case ASSERTION_THROWS      = 1007;
 	case ASSERTION_FAILED      = 1008;
+	case ASSERTION_SAME        = 1009;
 	#endregion
 }

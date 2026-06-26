@@ -169,5 +169,34 @@ final class RequestTest extends TestKernel
 			\RuntimeException::class
 		);
 	}
+
+	public function testGetAttributeAsReturnsCorrectType(): void
+	{
+		$obj = new \stdClass();
+
+		$request = new Request(
+			method: HttpMethod::GET,
+			uri: '/',
+			attributes: ['obj' => $obj]
+		);
+
+		$result = $request->getAttributeAs('obj', \stdClass::class);
+
+		$this->assertSame($obj, $result);
+	}
+
+	public function testGetAttributeAsThrowsOnInvalidType(): void
+	{
+		$request = new Request(
+			method: HttpMethod::GET,
+			uri: '/',
+			attributes: ['obj' => new \stdClass()]
+		);
+
+		$this->assertThrows(
+			fn() => $request->getAttributeAs('obj', \DateTime::class),
+			\RuntimeException::class
+		);
+	}
 	#endregion
 }

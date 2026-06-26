@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace de\bifroststormengine\http\Request;
 
 use de\bifroststormengine\http\Enum\HttpMethod;
+use de\bifroststormengine\http\HttpDispatcher;
 use de\bifroststormengine\http\Routing\RouteMatch;
 #endregion
 
@@ -112,6 +113,33 @@ final class Request
 		return $this->attributes[$name] ?? $default;
 	}
 
+	/**
+	 * Typed Access for Attributes.
+	 *
+	 * @template T
+	 * @param class-string<T> $type
+	 * @param string $name
+	 * @return T
+	 */
+	public function getAttributeAs(string $name, string $type): object
+	{
+		$value = $this->attributes[$name] ?? null;
+
+		if (!$value instanceof $type)
+		{
+			throw new \RuntimeException(
+				sprintf(
+					'Attribute "%s" is not of expected type %s. Actual: %s',
+					$name,
+					$type,
+					get_debug_type($value)
+				)
+			);
+		}
+
+		return $value;
+	}
+
 	public function withAttribute(string $name, mixed $value): self
 	{
 		$clone = clone $this;
@@ -126,7 +154,7 @@ final class Request
 
 	public function getRouteMatch(): RouteMatch
 	{
-		$value = $this->attributes[\de\bifroststormengine\http\HttpDispatcher::ATTR_ROUTE_MATCH] ?? null;
+		$value = $this->attributes[HttpDispatcher::ATTR_ROUTE_MATCH] ?? null;
 
 		if (!$value instanceof RouteMatch)
 		{
