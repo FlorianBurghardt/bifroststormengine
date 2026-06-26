@@ -6,10 +6,10 @@ namespace de\bifroststormengine\tests\unit\http\Internal;
 use de\bifroststormengine\core\Enum\HTTPStatusCode;
 use de\bifroststormengine\core\Enum\PHPExceptionType;
 use de\bifroststormengine\core\Exception\FrameworkException;
-use de\bifroststormengine\core\Framework;
 use de\bifroststormengine\http\Enum\HttpMethod;
 use de\bifroststormengine\http\Internal\MiddlewareChainHandler;
 use de\bifroststormengine\http\Handler\HttpHandlerInterface;
+use de\bifroststormengine\http\Handler\MiddlewareInterface;
 use de\bifroststormengine\http\Request\Request;
 use de\bifroststormengine\http\Response\Response;
 use de\bifroststormengine\tests\Preparation\TestRequestFactory;
@@ -79,7 +79,7 @@ final class MiddlewareChainHandlerTest extends TestKernel
 
 	public function testMiddlewareReceivesNextHandler(): void
 	{
-		$middleware = new class
+		$middleware = new class implements MiddlewareInterface
 		{
 			public HttpHandlerInterface $nextRef;
 
@@ -114,7 +114,7 @@ final class MiddlewareChainHandlerTest extends TestKernel
 
 	public function testMiddlewareExceptionPropagates(): void
 	{
-		$middleware = new class
+		$middleware = new class implements MiddlewareInterface
 		{
 			public function process(Request $r, HttpHandlerInterface $next): Response
 			{
@@ -142,6 +142,23 @@ final class MiddlewareChainHandlerTest extends TestKernel
 			FrameworkException::class
 		);
 	}
+
+	public function testChainAssumesValidMiddleware(): void
+	{
+		$this->assertThrows(
+			fn() => new MiddlewareChainHandler(
+				finalHandler: new class implements HttpHandlerInterface
+				{
+					public function handle(Request $r): Response
+					{
+						return new Response(HTTPStatusCode::OK, [], 'OK');
+					}
+				},
+				middleware: [new \stdClass()] // ❌ invalid
+			),
+			\InvalidArgumentException::class
+		);
+	}
 	#endregion
 
 	#region private methods
@@ -150,7 +167,7 @@ final class MiddlewareChainHandlerTest extends TestKernel
 	 */
 	private function traceMiddleware(array &$trace, string $label): object
 	{
-		return new class($trace, $label)
+		return new class($trace, $label) implements MiddlewareInterface
 		{
 			public function __construct(
 				private array &$trace,
@@ -189,7 +206,7 @@ final class MiddlewareChainHandlerTest extends TestKernel
 	 */
 	private function shortCircuitMiddleware(array &$trace, string $label = 'short'): object
 	{
-		return new class($trace, $label)
+		return new class($trace, $label) implements MiddlewareInterface
 		{
 			public function __construct(
 				private array &$trace,

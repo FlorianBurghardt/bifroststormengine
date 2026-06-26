@@ -131,6 +131,28 @@ final class HttpDispatcherTest extends TestKernel
 		$this->assertEquals('Handler failed', $data['error']['message']);
 		$this->assertEquals(22222, $data['error']['innerCode']);
 	}
+
+	public function testDispatcherRejectsInvalidMiddleware(): void
+	{
+		$router = new class implements RouterInterface
+		{
+			public function addRoute(Route $route): void {}
+
+			public function match(Request $request): RouteMatch
+			{
+				throw new \RuntimeException('Should not be called');
+			}
+		};
+
+		$this->assertThrows(
+			fn() => new HttpDispatcher(
+				router: $router,
+				exceptionResponder: $this->createExceptionResponder(),
+				middleware: [new \stdClass()] // ❌ invalid
+			),
+			\InvalidArgumentException::class
+		);
+	}
 	#endregion
 
 	#region private methods

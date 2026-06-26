@@ -4,22 +4,32 @@ declare(strict_types=1);
 namespace de\bifroststormengine\http\Internal;
 
 use de\bifroststormengine\http\Handler\HttpHandlerInterface;
+use de\bifroststormengine\http\Handler\MiddlewareInterface;
 use de\bifroststormengine\http\Request\Request;
 use de\bifroststormengine\http\Response\Response;
 #endregion
 
 /**
  * @internal
- * Verkettet Middleware-Instanzen mit einem finalen Handler.
+ * Chains middleware instances to a final handler.
  */
 final class MiddlewareChainHandler implements HttpHandlerInterface
 {
+	#region properties
+	/** @var MiddlewareInterface[] */
+	private readonly array $middleware;
+	#endregion
+
 	#region constructor
 	public function __construct(
 		private readonly HttpHandlerInterface $finalHandler,
-		private readonly array $middleware,
+		array $middleware,
 		private readonly int $index = 0
-	) {}
+	)
+	{
+		// Validation in dispatcher
+		$this->middleware = $middleware;
+	}
 	#endregion
 
 	#region public methods

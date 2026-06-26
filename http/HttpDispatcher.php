@@ -8,6 +8,7 @@ use de\bifroststormengine\http\Internal\MiddlewareChainHandler;
 use de\bifroststormengine\http\Request\Request;
 use de\bifroststormengine\http\Response\Response;
 use de\bifroststormengine\http\Routing\RouterInterface;
+use de\bifroststormengine\http\Handler\MiddlewareInterface;
 use Throwable;
 #endregion
 
@@ -17,12 +18,31 @@ final class HttpDispatcher
 	public const ATTR_ROUTE_MATCH = 'routeMatch';
 	#endregion
 
+	#region properties
+	/** @var MiddlewareInterface[] */
+	private readonly array $middleware;
+	#endregion
+
 	#region constructor
 	public function __construct(
 		private readonly RouterInterface $router,
 		private readonly HttpExceptionResponder $exceptionResponder,
-		private readonly array $middleware = [],
-	) {}
+		array $middleware = [],
+	)
+	{
+		foreach ($middleware as $m)
+		{
+			if (!$m instanceof MiddlewareInterface)
+			{
+				throw new \InvalidArgumentException(
+					sprintf('Invalid middleware instance of type %s',
+					get_debug_type($m))
+				);
+			}
+		}
+
+		$this->middleware = $middleware;
+	}
 	#endregion
 
 	#region public methods
