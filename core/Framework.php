@@ -2,6 +2,9 @@
 #region usings
 declare(strict_types=1);
 namespace de\bifroststormengine\core;
+
+use de\bifroststormengine\http\Routing\RouterInterface;
+use de\bifroststormengine\http\Exception\HttpExceptionResponder;
 #endregion
 
 final class Framework
@@ -45,6 +48,19 @@ final class Framework
 	public static function getVersion(): string
 	{
 		return self::VERSION;
+	}
+
+	public static function createKernel(
+		RouterInterface $router,
+		array $middleware,
+		HttpExceptionResponder $exceptionResponder
+	): Kernel
+	{
+		return new Kernel(
+			router: $router,
+			middleware: $middleware,
+			exceptionResponder: $exceptionResponder
+		);
 	}
 	#endregion
 }

@@ -143,20 +143,22 @@ final class MiddlewareChainHandlerTest extends TestKernel
 		);
 	}
 
-	public function testChainAssumesValidMiddleware(): void
+	public function testChainDoesNotValidateMiddleware(): void
 	{
-		$this->assertThrows(
-			fn() => new MiddlewareChainHandler(
-				finalHandler: new class implements HttpHandlerInterface
+		$handler = new MiddlewareChainHandler(
+			finalHandler: new class implements HttpHandlerInterface
+			{
+				public function handle(Request $r): Response
 				{
-					public function handle(Request $r): Response
-					{
-						return new Response(HTTPStatusCode::OK, [], 'OK');
-					}
-				},
-				middleware: [new \stdClass()] // ❌ invalid
-			),
-			\InvalidArgumentException::class
+					return new Response(HTTPStatusCode::OK, [], 'OK');
+				}
+			},
+			middleware: [new \stdClass()] // Validation via parent class
+		);
+		$this->assertInstanceOf(
+			MiddlewareChainHandler::class,
+			$handler,
+			'MiddlewareChainHandler should not validate middleware itself.'
 		);
 	}
 	#endregion
