@@ -16,6 +16,14 @@ focused on deterministic request handling, clear architecture, and strong typing
 
 ---
 
+## 📘 Documentation
+
+Full documentation available here:
+
+👉 [View Documentation](./docs/README.md)
+
+---
+
 ## Core Principles
 
 ### Zero Dependency
