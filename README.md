@@ -6,7 +6,7 @@ Lightweight, zero-dependency PHP framework with deterministic architecture.
 
 Full documentation available here:
 
-👉 [View Documentation](./docs/README.md)
+👉 [View detailed README](./docs/README.md)
 
 ## 🚀 Quick Start
 

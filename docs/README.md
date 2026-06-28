@@ -20,7 +20,10 @@ focused on deterministic request handling, clear architecture, and strong typing
 
 Full documentation available here:
 
-👉 [View Documentation](./docs/README.md)
+👉 [Architecture](./architecture/)
+👉 [Concepts](./concepts/)
+👉 [Decisions](./decisions/)
+👉 [Getting-Started](./getting-started/getting-started.md)
 
 ---
 
