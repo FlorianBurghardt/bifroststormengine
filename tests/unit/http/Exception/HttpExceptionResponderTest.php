@@ -3,9 +3,11 @@
 declare(strict_types=1);
 namespace de\bifroststormengine\tests\unit\http\Exception;
 
+use de\bifroststormengine\core\config\Config;
 use de\bifroststormengine\core\Enum\HTTPExceptionType;
 use de\bifroststormengine\core\Enum\HTTPStatusCode;
 use de\bifroststormengine\core\Enum\PHPExceptionType;
+use de\bifroststormengine\core\environment\Environment;
 use de\bifroststormengine\core\Exception\FrameworkException;
 use de\bifroststormengine\core\Exception\HttpErrorHandler;
 use de\bifroststormengine\core\FrameworkManifestProvider;
@@ -61,14 +63,63 @@ final class HttpExceptionResponderTest extends TestKernel
 		$this->assertEquals(12345, $body['error']['innerCode']);
 		$this->assertEquals(HTTPExceptionType::BAD_REQUEST->name, $body['error']['type']);
 	}
+
+	public function testDebugOutputOnlyInDev(): void
+	{
+		$config = new Config(['debug' => true]);
+
+		$responder = new HttpExceptionResponder(
+			coreErrorHandler: $this->createErrorHandler(),
+			config: $config,
+			env: Environment::DEV
+		);
+
+		$response = $responder->toHttpResponse(
+			new \RuntimeException('test')
+		);
+
+		$data = \json_decode($response->getBody(), true);
+
+		$this->assertTrue(isset($data['debug']));
+	}
+
+	public function testNoDebugOutputInProd(): void
+	{
+		$config = new Config(['debug' => true]);
+
+		$responder = new HttpExceptionResponder(
+			coreErrorHandler: $this->createErrorHandler(),
+			config: $config,
+			env: Environment::PROD
+		);
+
+		$response = $responder->toHttpResponse(
+			new \RuntimeException('test')
+		);
+
+		$data = \json_decode($response->getBody(), true);
+
+		$this->assertFalse(isset($data['debug']));
+	}
 	#endregion
 
 	#region private methods
 	private function createResponder(): HttpExceptionResponder
 	{
+		return new HttpExceptionResponder(
+			coreErrorHandler: $this->createErrorHandler(),
+			config: new Config([]), // Default: debug off
+			env: Environment::TEST
+		);
+	}
+
+	private function createErrorHandler(): HttpErrorHandler
+	{
 		$manifestProvider = new FrameworkManifestProvider(null);
-		$coreHandler      = new HttpErrorHandler($manifestProvider);
-		return new HttpExceptionResponder($coreHandler);
+
+		return new HttpErrorHandler(
+			$manifestProvider
+		);
 	}
 	#endregion
 }

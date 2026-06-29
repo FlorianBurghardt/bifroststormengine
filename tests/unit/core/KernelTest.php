@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace de\bifroststormengine\tests\unit\core;
 
+use de\bifroststormengine\core\config\Config;
 use de\bifroststormengine\core\Kernel;
 use de\bifroststormengine\http\Request\Request;
 use de\bifroststormengine\http\Response\Response;
@@ -16,6 +17,7 @@ use de\bifroststormengine\core\Exception\HttpErrorHandler;
 use de\bifroststormengine\tests\TestKernel;
 use de\bifroststormengine\http\Enum\HttpMethod;
 use de\bifroststormengine\core\Enum\HTTPStatusCode;
+use de\bifroststormengine\core\environment\Environment;
 #endregion
 
 final class KernelTest extends TestKernel
@@ -48,9 +50,7 @@ final class KernelTest extends TestKernel
 			}
 		};
 
-		$responder = new HttpExceptionResponder(
-			new HttpErrorHandler(new FrameworkManifestProvider(null))
-		);
+		$responder = $this->createResponder();
 
 		$kernel = new Kernel(
 			router: $router,
@@ -66,6 +66,26 @@ final class KernelTest extends TestKernel
 		$response = $kernel->handle($request);
 
 		$this->assertEquals(HTTPStatusCode::OK, $response->getStatusCode());
+	}
+	#endregion
+
+	#region private methods
+	private function createResponder(): HttpExceptionResponder
+	{
+		return new HttpExceptionResponder(
+			coreErrorHandler: $this->createErrorHandler(),
+			config: new Config([]), // Default: debug off
+			env: Environment::TEST
+		);
+	}
+
+	private function createErrorHandler(): HttpErrorHandler
+	{
+		$manifestProvider = new FrameworkManifestProvider(null);
+
+		return new HttpErrorHandler(
+			$manifestProvider
+		);
 	}
 	#endregion
 }

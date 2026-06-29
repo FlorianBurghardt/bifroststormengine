@@ -3,8 +3,10 @@
 declare(strict_types=1);
 namespace de\bifroststormengine\tests\unit\http;
 
+use de\bifroststormengine\core\config\Config;
 use de\bifroststormengine\core\Enum\HTTPExceptionType;
 use de\bifroststormengine\core\Enum\HTTPStatusCode;
+use de\bifroststormengine\core\environment\Environment;
 use de\bifroststormengine\core\Exception\FrameworkException;
 use de\bifroststormengine\core\Exception\HttpErrorHandler;
 use de\bifroststormengine\core\FrameworkManifestProvider;
@@ -158,9 +160,20 @@ final class HttpDispatcherTest extends TestKernel
 	#region private methods
 	private function createExceptionResponder(): HttpExceptionResponder
 	{
+		return new HttpExceptionResponder(
+			coreErrorHandler: $this->createErrorHandler(),
+			config: new Config([]),
+			env: Environment::TEST
+			);
+	}
+
+	private function createErrorHandler(): HttpErrorHandler
+	{
 		$manifestProvider = new FrameworkManifestProvider(null);
-		$coreHandler      = new HttpErrorHandler($manifestProvider);
-		return new HttpExceptionResponder($coreHandler);
+
+		return new HttpErrorHandler(
+			$manifestProvider
+		);
 	}
 	#endregion
 }

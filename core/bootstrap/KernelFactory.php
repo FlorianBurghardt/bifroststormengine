@@ -6,6 +6,7 @@ namespace de\bifroststormengine\core\bootstrap;
 use de\bifroststormengine\core\Kernel;
 use de\bifroststormengine\core\config\ConfigInterface;
 use de\bifroststormengine\core\environment\Environment;
+use de\bifroststormengine\core\Exception\HttpErrorHandler;
 use de\bifroststormengine\http\Routing\RouterInterface;
 use de\bifroststormengine\http\Exception\HttpExceptionResponder;
 #endregion
@@ -23,10 +24,15 @@ final class KernelFactory
 	public function create(
 		RouterInterface $router,
 		array $middleware,
-		HttpExceptionResponder $exceptionResponder
+		HttpErrorHandler $errorHandler
 	): Kernel
 	{
-		// Wichtig: KEINE Logik, nur Weiterleitung
+		$exceptionResponder = new HttpExceptionResponder(
+			coreErrorHandler: $errorHandler,
+			config: $this->config,
+			env: $this->env
+		);
+
 		return new Kernel(
 			router: $router,
 			middleware: $middleware,

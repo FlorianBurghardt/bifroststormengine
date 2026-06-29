@@ -3,8 +3,10 @@
 declare(strict_types=1);
 namespace de\bifroststormengine\tests\integration\http;
 
+use de\bifroststormengine\core\config\Config;
 use de\bifroststormengine\core\Enum\HTTPExceptionType;
 use de\bifroststormengine\core\Enum\HTTPStatusCode;
+use de\bifroststormengine\core\environment\Environment;
 use de\bifroststormengine\core\Exception\FrameworkException;
 use de\bifroststormengine\core\Exception\HttpErrorHandler;
 use de\bifroststormengine\core\FrameworkManifestProvider;
@@ -111,12 +113,25 @@ final class HttpPipelineIntegrationTest extends TestKernel
 
 		$manifestProvider = new FrameworkManifestProvider(null);
 		$coreErrorHandler = new HttpErrorHandler($manifestProvider);
-		$exceptionResponder = new HttpExceptionResponder($coreErrorHandler);
+		$exceptionResponder = new HttpExceptionResponder(
+			coreErrorHandler: $coreErrorHandler,
+			config: new Config([]),
+			env: Environment::TEST
+		);
 
 		return new HttpDispatcher(
 			router: $router,
 			exceptionResponder: $exceptionResponder,
 			middleware: []
+		);
+	}
+
+	private function createErrorHandler(): HttpErrorHandler
+	{
+		$manifestProvider = new FrameworkManifestProvider(null);
+
+		return new HttpErrorHandler(
+			$manifestProvider
 		);
 	}
 	#endregion

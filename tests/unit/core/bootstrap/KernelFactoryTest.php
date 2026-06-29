@@ -6,9 +6,13 @@ namespace de\bifroststormengine\tests\unit\core\bootstrap;
 use de\bifroststormengine\core\bootstrap\KernelFactory;
 use de\bifroststormengine\core\config\Config;
 use de\bifroststormengine\core\environment\Environment;
+use de\bifroststormengine\core\Exception\HttpErrorHandler;
+use de\bifroststormengine\core\FrameworkManifestProvider;
 use de\bifroststormengine\core\Kernel;
+use de\bifroststormengine\http\Request\Request;
+use de\bifroststormengine\http\Routing\Route;
+use de\bifroststormengine\http\Routing\RouteMatch;
 use de\bifroststormengine\http\Routing\RouterInterface;
-use de\bifroststormengine\http\Exception\HttpExceptionResponder;
 use de\bifroststormengine\tests\TestKernel;
 #endregion
 
@@ -21,12 +25,11 @@ final class KernelFactoryTest extends TestKernel
 		$factory = new KernelFactory($config, Environment::DEV);
 
 		$router = $this->createRouter();
-		$responder = $this->createResponder();
 
 		$kernel = $factory->create(
 			router: $router,
 			middleware: [],
-			exceptionResponder: $responder
+			errorHandler: $this->createErrorHandler()
 		);
 
 		$this->assertInstanceOf(Kernel::class, $kernel);
@@ -37,21 +40,21 @@ final class KernelFactoryTest extends TestKernel
 	private function createRouter(): RouterInterface
 	{
 		return new class implements RouterInterface {
-			public function addRoute(\de\bifroststormengine\http\Routing\Route $route): void {}
+			public function addRoute(Route $route): void {}
 
-			public function match(\de\bifroststormengine\http\Request\Request $request): \de\bifroststormengine\http\Routing\RouteMatch
+			public function match(Request $request): RouteMatch
 			{
 				throw new \RuntimeException('Not used');
 			}
 		};
 	}
 
-	private function createResponder(): HttpExceptionResponder
+	private function createErrorHandler(): HttpErrorHandler
 	{
-		return new HttpExceptionResponder(
-			new \de\bifroststormengine\core\Exception\HttpErrorHandler(
-				new \de\bifroststormengine\core\FrameworkManifestProvider(null)
-			)
+		$manifestProvider = new FrameworkManifestProvider(null);
+
+		return new HttpErrorHandler(
+			$manifestProvider
 		);
 	}
 	#endregion
