@@ -3,14 +3,25 @@
 ## Minimal Working Example
 
 ```php
-use de\bifroststormengine\core\Framework;
+use de\bifroststormengine\core\config\Config;
+use de\bifroststormengine\core\bootstrap\KernelFactory;
+use de\bifroststormengine\core\environment\Environment;
 use de\bifroststormengine\http\Enum\HttpMethod;
 use de\bifroststormengine\http\Request\Request;
 
-$kernel = Framework::createKernel(
-	router: $router,
-	middleware: [],
-	exceptionResponder: $exceptionResponder
+$config = new Config([
+    'debug' => true
+]);
+
+$factory = new KernelFactory(
+    config: $config,
+    env: Environment::DEV
+);
+
+$kernel = $factory->create(
+    router: $router,
+    middleware: [],
+    errorHandler: $errorHandler
 );
 
 $request = new Request(

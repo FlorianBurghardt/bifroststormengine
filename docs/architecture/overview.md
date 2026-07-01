@@ -2,21 +2,40 @@
 
 The Bifrost StormEngine is structured as a layered HTTP framework.
 
+---
+
+
 ## High-Level Flow
 
-Request → Kernel → Dispatcher → Router → Middleware → Handler → Response
+```text
+Request → Kernel → Dispatcher → Handler → Response
+```
+
+## Bootstrap Flow
+
+```text
+Config + Environment → KernelFactory → Kernel
+```
 
 ## Key Components
 
 - Kernel (Entry Point)
+- KernelFactory (Bootstrap Layer)
 - HttpDispatcher (Orchestrator)
 - Router (Route Matching)
 - MiddlewareChainHandler (Execution)
 - Request (Typed Data Access Layer)
 
+## Key Additions
+
+- Dedicated bootstrap layer
+- Configuration-driven setup
+- Environment-aware behavior
+- Controlled debug handling (safe for production)
+
 ## Design Goals
 
-- Clear responsibility
+- Clear responsibility boundaries
 - Strong typing
 - Deterministic execution
 - Extensibility
