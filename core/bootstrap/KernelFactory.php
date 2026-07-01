@@ -23,10 +23,13 @@ final class KernelFactory
 	#region public methods
 	public function create(
 		RouterInterface $router,
-		array $middleware,
+		?array $middleware,
 		HttpErrorHandler $errorHandler
 	): Kernel
 	{
+		$middleware = $middleware
+			?? (new MiddlewareBuilder($this->config))->build();
+
 		$exceptionResponder = new HttpExceptionResponder(
 			coreErrorHandler: $errorHandler,
 			config: $this->config,

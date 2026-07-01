@@ -168,6 +168,29 @@ abstract class TestKernel
 		);
 	}
 
+	protected function assertCount(int $expectedCount, iterable $value, string $message = ''): void
+	{
+		if (!is_array($value) && !$value instanceof \Countable)
+		{
+			throw new TestException(
+				TestExceptionType::ASSERTION_FAILED,
+				TestExceptionType::ASSERTION_FAILED->value,
+				"assertCount failed: value is not countable"
+			);
+		}
+
+		$actual = count($value);
+
+		if ($actual !== $expectedCount)
+		{
+			throw new TestException(
+				TestExceptionType::ASSERTION_EQUALS,
+				TestExceptionType::ASSERTION_EQUALS->value,
+				"assertCount failed: {$message}\nExpected: {$expectedCount}\nActual: {$actual}"
+			);
+		}
+	}
+
 	protected function fail(string $message = ''): void
 	{
 		throw new TestException(

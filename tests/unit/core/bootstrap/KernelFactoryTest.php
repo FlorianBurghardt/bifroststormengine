@@ -13,6 +13,7 @@ use de\bifroststormengine\http\Request\Request;
 use de\bifroststormengine\http\Routing\Route;
 use de\bifroststormengine\http\Routing\RouteMatch;
 use de\bifroststormengine\http\Routing\RouterInterface;
+use de\bifroststormengine\tests\fixtures\middleware\TestMiddleware;
 use de\bifroststormengine\tests\TestKernel;
 #endregion
 
@@ -28,6 +29,44 @@ final class KernelFactoryTest extends TestKernel
 
 		$kernel = $factory->create(
 			router: $router,
+			middleware: [],
+			errorHandler: $this->createErrorHandler()
+		);
+
+		$this->assertInstanceOf(Kernel::class, $kernel);
+	}
+
+	public function testFactoryUsesConfigMiddleware(): void
+	{
+		$config = new Config([
+			'middleware' => [
+				TestMiddleware::class
+			]
+		]);
+
+		$factory = new KernelFactory($config, Environment::DEV);
+
+		$kernel = $factory->create(
+			router: $this->createRouter(),
+			middleware: null,
+			errorHandler: $this->createErrorHandler()
+		);
+
+		$this->assertInstanceOf(Kernel::class, $kernel);
+	}
+
+	public function testFactoryOverrideMiddleware(): void
+	{
+		$config = new Config([
+			'middleware' => [
+				TestMiddleware::class
+			]
+		]);
+
+		$factory = new KernelFactory($config, Environment::DEV);
+
+		$kernel = $factory->create(
+			router: $this->createRouter(),
 			middleware: [],
 			errorHandler: $this->createErrorHandler()
 		);
