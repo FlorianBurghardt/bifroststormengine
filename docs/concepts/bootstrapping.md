@@ -13,6 +13,7 @@ The factory wires together:
 - Config
 - Environment
 - Error handling
+- Middleware (via configuration)
 
 and produces a fully configured `Kernel`.
 
@@ -30,13 +31,24 @@ final class KernelFactory
 
 	public function create(
 		RouterInterface $router,
-		array $middleware,
+		?array $middleware,
 		HttpErrorHandler $errorHandler
 	): Kernel
 }
 ```
 
-## Key Behavior
+## Middleware Resolution
+
+```php
+$middleware = $middleware
+	?? (new MiddlewareBuilder($this->config))->build();
+```
+## Behavior
+
+- If middleware is explicitly provided → it is used
+- If middleware is null → it is built from config
+
+## Responder Setup
 
 ```php
 $exceptionResponder = new HttpExceptionResponder(
@@ -50,11 +62,12 @@ $exceptionResponder = new HttpExceptionResponder(
 
 - The factory contains no business logic
 - It only wires dependencies
+- Middleware construction is delegated to a dedicated builder
 - No dependency injection container is used
 
 ## Result
 
 - Clean application bootstrap
-- Centralized configuration point
+- Config-driven middleware
+- Explicit override capability
 - Strong separation of concerns
-- Future extensibility enabled

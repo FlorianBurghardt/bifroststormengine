@@ -14,13 +14,14 @@ Request → Kernel → Dispatcher → Handler → Response
 ## Bootstrap Flow
 
 ```text
-Config + Environment → KernelFactory → Kernel
+Config + Environment → MiddlewareBuilder → KernelFactory → Kernel → Dispatcher
 ```
 
 ## Key Components
 
 - Kernel (Entry Point)
 - KernelFactory (Bootstrap Layer)
+- MiddlewareBuilder (Config-driven construction)
 - HttpDispatcher (Orchestrator)
 - Router (Route Matching)
 - MiddlewareChainHandler (Execution)
@@ -29,9 +30,11 @@ Config + Environment → KernelFactory → Kernel
 ## Key Additions
 
 - Dedicated bootstrap layer
-- Configuration-driven setup
+- Config-driven middleware pipeline
 - Environment-aware behavior
 - Controlled debug handling (safe for production)
+- Deterministic middleware construction
+- Fail-fast validation strategy
 
 ## Design Goals
 

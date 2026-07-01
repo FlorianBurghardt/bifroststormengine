@@ -6,22 +6,23 @@
 use de\bifroststormengine\core\config\Config;
 use de\bifroststormengine\core\bootstrap\KernelFactory;
 use de\bifroststormengine\core\environment\Environment;
+use de\bifroststormengine\core\Exception\HttpErrorHandler;
 use de\bifroststormengine\http\Enum\HttpMethod;
 use de\bifroststormengine\http\Request\Request;
 
 $config = new Config([
-    'debug' => true
+	'debug' => true
 ]);
 
 $factory = new KernelFactory(
-    config: $config,
-    env: Environment::DEV
+	config: $config,
+	env: Environment::DEV
 );
 
 $kernel = $factory->create(
-    router: $router,
-    middleware: [],
-    errorHandler: $errorHandler
+	router: $router,
+	middleware: [], // explicit override
+	errorHandler: $errorHandler
 );
 
 $request = new Request(
@@ -30,6 +31,22 @@ $request = new Request(
 );
 
 $response = $kernel->handle($request);
+```
+
+## Config-driven Middleware
+
+```php
+$config = new Config([
+    'middleware' => [
+        TestMiddleware::class
+    ]
+]);
+
+$kernel = $factory->create(
+    router: $router,
+    middleware: null, // use config
+    errorHandler: $errorHandler
+);
 ```
 
 ## Example Route

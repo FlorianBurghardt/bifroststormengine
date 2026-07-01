@@ -184,8 +184,8 @@ abstract class TestKernel
 		if ($actual !== $expectedCount)
 		{
 			throw new TestException(
-				TestExceptionType::ASSERTION_EQUALS,
-				TestExceptionType::ASSERTION_EQUALS->value,
+				TestExceptionType::ASSERTION_COUNT,
+				TestExceptionType::ASSERTION_COUNT->value,
 				"assertCount failed: {$message}\nExpected: {$expectedCount}\nActual: {$actual}"
 			);
 		}
